@@ -33,7 +33,7 @@ https://en.wikipedia.org/wiki/Reactive_programming
 ```text
 100, 20, 3023, (A+E), 10, -30, (D+10), 0, 12345
 A=>10
-C=>{A*E}
+C=>(A*E)
 E=>100
 ```
 
