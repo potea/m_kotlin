@@ -6,12 +6,12 @@ private fun String.removeBrackets(): String {
     return replace("[","").replace("]","")
 }
 
-infix fun String.ofLeft(c: String): Char { 
-    return this[this.indexOf(c) - 1] 
+infix fun String.leftOf(c: String): Char {
+    return this[this.indexOf(c) - 1]
 }
 
-infix fun String.ofRight(c: String): Char { 
-    return this[this.indexOf(c) + 1] 
+infix fun String.rightOf(c: String): Char {
+    return this[this.indexOf(c) + 1]
 }
 // End of Common
 
@@ -117,14 +117,14 @@ abstract class Cell(var value: String) {
                 .forEach { funcExp ->
                     result = result.replace(funcExp, Engine.Func.values()
                         .filter { funcExp.contains(it.name) }
-                        .map { it.eval(funcExp ofLeft ":", funcExp ofRight ":") }
+                        .map { it.eval(funcExp leftOf ":", funcExp rightOf ":") }
                         .toString()).removeBrackets()
                 }
 
         return result
     }
 
-    private fun subStringFunc(it: Engine.Func, value: String) 
+    private fun subStringFunc(it: Engine.Func, value: String)
             = value.substring(value.indexOf(it.name), value.indexOf(")") + 1)
 
 }
