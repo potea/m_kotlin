@@ -1,6 +1,20 @@
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 
+// Common
+private fun String.removeBrackets(): String {
+    return replace("[","").replace("]","")
+}
+
+infix fun String.ofLeft(c: String): Char { 
+    return this[this.indexOf(c) - 1] 
+}
+
+infix fun String.ofRight(c: String): Char { 
+    return this[this.indexOf(c) + 1] 
+}
+// End of Common
+
 // Reactive System
 interface Reaction {
     fun react()
@@ -28,15 +42,10 @@ object Engine {
     val js = ScriptEngineManager().getEngineByName("JavaScript")!!
 
     enum class Func {
-        SUM {
-            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.sum()
-        }, AVERAGE {
-            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.average()?.toInt()
-        }, MAX {
-            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.max()
-        }, MIN { 
-            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.min()
-        };
+        SUM { override fun eval(l: Char, r: Char): Int? = cells(l, r)?.sum() },
+        AVERAGE { override fun eval(l: Char, r: Char): Int? = cells(l, r)?.average()?.toInt() },
+        MAX { override fun eval(l: Char, r: Char): Int? = cells(l, r)?.max() },
+        MIN { override fun eval(l: Char, r: Char): Int? = cells(l, r)?.min() };
 
         abstract fun eval(l: Char, r: Char): Int?
 
@@ -103,17 +112,21 @@ abstract class Cell(var value: String) {
         var result = value
 
         Engine.Func.values()
-            .filter { value.contains(it.name) }
-            .map { value.substring(value.indexOf(it.name), value.indexOf(")") + 1) }
-            .forEach { funcExp ->
-                result = result.replace(funcExp, Engine.Func.values()
-                    .filter { funcExp.contains(it.name) }
-                    .map { it.eval(funcExp[funcExp.indexOf(":") - 1], funcExp[funcExp.indexOf(":") + 1]) }
-                    .toString()).replace("[","").replace("]","")
-            }
+                .filter { value.contains(it.name) }
+                .map { subStringFunc(it, value) }
+                .forEach { funcExp ->
+                    result = result.replace(funcExp, Engine.Func.values()
+                        .filter { funcExp.contains(it.name) }
+                        .map { it.eval(funcExp ofLeft ":", funcExp ofRight ":") }
+                        .toString()).removeBrackets()
+                }
 
         return result
     }
+
+    private fun subStringFunc(it: Engine.Func, value: String) 
+            = value.substring(value.indexOf(it.name), value.indexOf(")") + 1)
+
 }
 // End of SpreadSheet
 
@@ -163,10 +176,10 @@ private fun App.printResult(input: List<String>) {
         App.log.clear()
 
         val outputLog =
-            command + " : " + Sheet.replaceCell(command).toString() + ", " +
-            App.log.map { Sheet.getLetter(it) + "=>" + it.evaluated }
+                command + " : " + Sheet.replaceCell(command).toString() + ", " +
+                App.log.map { Sheet.getLetter(it) + "=>" + it.evaluated }
 
-        println(outputLog.replace("[","").replace("]",""))
+        println(outputLog.removeBrackets())
     }
 }
 
