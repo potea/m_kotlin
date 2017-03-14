@@ -29,22 +29,19 @@ object Engine {
 
     enum class Func {
         SUM {
-            override fun eval(begin: Char, end: Char): Int? = cells(begin, end)?.sum()
-        },
-        AVERAGE {
-            override fun eval(begin: Char, end: Char): Int? = cells(begin, end)?.average() as Int
-        },
-        MAX {
-            override fun eval(begin: Char, end: Char): Int? = cells(begin, end)?.max()
-        },
-        MIN {
-            override fun eval(begin: Char, end: Char): Int? = cells(begin, end)?.min()
+            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.sum()
+        }, AVERAGE {
+            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.average() as Int
+        }, MAX {
+            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.max()
+        }, MIN { 
+            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.min()
         };
 
-        abstract fun eval(begin: Char, end: Char): Int?
+        abstract fun eval(l: Char, r: Char): Int?
 
-        protected fun cells(begin: Char, end: Char): List<Int>? {
-            return Sheet.row?.subList(begin - 'A', end - 'A')?.map(Cell::calc)
+        protected fun cells(l: Char, r: Char): List<Int>? {
+            return Sheet.row?.subList(l - 'A', r - 'A')?.map(Cell::calc)
         }
     }
 }
