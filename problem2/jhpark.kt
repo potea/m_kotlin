@@ -103,14 +103,14 @@ abstract class Cell(var value: String) {
         var result = value
 
         Engine.Func.values()
-                .filter { value.contains(it.name) }
-                .map { value.substring(value.indexOf(it.name), value.indexOf(")") + 1) }
-                .forEach { funcExp ->
-                    result = result.replace(funcExp, Engine.Func.values()
-                        .filter { funcExp.contains(it.name) }
-                        .map { it.eval(funcExp[funcExp.indexOf(":") - 1], funcExp[funcExp.indexOf(":") + 1]) }
-                        .toString()).replace("[","").replace("]","")
-                }
+            .filter { value.contains(it.name) }
+            .map { value.substring(value.indexOf(it.name), value.indexOf(")") + 1) }
+            .forEach { funcExp ->
+                result = result.replace(funcExp, Engine.Func.values()
+                    .filter { funcExp.contains(it.name) }
+                    .map { it.eval(funcExp[funcExp.indexOf(":") - 1], funcExp[funcExp.indexOf(":") + 1]) }
+                    .toString()).replace("[","").replace("]","")
+            }
 
         return result
     }
@@ -163,8 +163,8 @@ private fun App.printResult(input: List<String>) {
         App.log.clear()
 
         val outputLog =
-                command + " : " + Sheet.replaceCell(command).toString() + ", " +
-                App.log.map { Sheet.getLetter(it) + "=>" + it.evaluated }
+            command + " : " + Sheet.replaceCell(command).toString() + ", " +
+            App.log.map { Sheet.getLetter(it) + "=>" + it.evaluated }
 
         println(outputLog.replace("[","").replace("]",""))
     }
