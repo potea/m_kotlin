@@ -31,7 +31,7 @@ object Engine {
         SUM {
             override fun eval(l: Char, r: Char): Int? = cells(l, r)?.sum()
         }, AVERAGE {
-            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.average() as Int
+            override fun eval(l: Char, r: Char): Int? = cells(l, r)?.average()?.toInt()
         }, MAX {
             override fun eval(l: Char, r: Char): Int? = cells(l, r)?.max()
         }, MIN { 
