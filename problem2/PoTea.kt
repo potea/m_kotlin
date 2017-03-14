@@ -1,8 +1,7 @@
 /**
  * Created by potea on 2017-03-07.
  *
- * 문제1: 기본 설계 이후, 문법 적용에 시간이 오래 걸려 마무리 못함
- * + 문제2 풀이 과정에서 추가
+ * 문제2: 문제1 풀이에 함수 처리 추가
  */
 
 import javax.script.ScriptEngineManager
@@ -10,6 +9,31 @@ import javax.script.ScriptException
 
 object Engine {
     val js = ScriptEngineManager().getEngineByName("JavaScript")!!
+}
+
+enum class Func {
+    SUM {
+        override fun calculation(array: IntArray): Int {
+            return array.sum()
+        }
+    },
+    AVERAGE {
+        override fun calculation(array: IntArray): Int {
+            return array.average().toInt()
+        }
+    },
+    MAX {
+        override fun calculation(array: IntArray): Int {
+            return array.max()!!.toInt()
+        }
+    },
+    MIN {
+        override fun calculation(array: IntArray): Int {
+            return array.min()!!.toInt()
+        }
+    };
+
+    abstract fun calculation(array: IntArray): Int
 }
 
 open class ReactCell {
@@ -34,7 +58,8 @@ class Cell(var name: Char, var cell: String) : ReactCell() {
 
     fun initialize() {
         if (isExpression()) {
-            cell.filter(Char::isLetter).forEach {
+            val list = getCellNames();
+            list.forEach {
                 Sheet.connectCell(it, name)
             }
         }
@@ -42,7 +67,8 @@ class Cell(var name: Char, var cell: String) : ReactCell() {
 
     fun change(data: String) {
         if (isExpression()) {
-            cell.filter(Char::isLetter).forEach {
+            val list = getCellNames();
+            list.forEach {
                 Sheet.disconnectCell(it, name)
             }
         }
@@ -72,29 +98,56 @@ class Cell(var name: Char, var cell: String) : ReactCell() {
             return cell.toInt()
         }
         else {
-            var result = cell
-
-            cell.filter(Char::isLetter).forEach {
-                result = result.replace(it.toString(), Sheet.getResult(it))
+            var result = cell.substring(1)
+            if (cell.contains(":")) {
+                val list = getCellNames()
+                var values = IntArray(list.size)
+                for (index in list.indices) {
+                    val exp = Sheet.getResult(list[index])
+                    if (exp == "#err") {
+                        throw ArithmeticException()
+                    }
+                    else {
+                        values[index] = exp.toInt()
+                    }
+                }
+                for (func in Func.values()) {
+                    if (cell.contains(func.name)) {
+                        return func.calculation(values)
+                    }
+                }
             }
+            else {
+                cell.filter(Char::isLetter).forEach {
+                    result = result.replace(it.toString(), Sheet.getResult(it))
+                }
 
-            try {
-                return Engine.js.eval(result) as Int
-            } catch (e: ScriptException) {
-                throw ArithmeticException()
+                try {
+                    return Engine.js.eval(result) as Int
+                } catch (e: ScriptException) {
+                    throw ArithmeticException()
+                }
             }
         }
+        throw ArithmeticException()
     }
 
     private fun isExpression(): Boolean {
-        try {
-            cell.toInt()
-            return false
-        } catch (e: NumberFormatException) {
-            return true
-        }
+        return cell.startsWith("=")
     }
 
+    private fun getCellNames(): List<Char> {
+        var result = cell.substring(1)
+
+        for (func in Func.values()) {
+            if (cell.contains(func.name)) {
+                result = result.replace(func.name, "").replace("(", "").replace(")", "")
+                return CharProgression.fromClosedRange(result[0], result[2], 1).toList()
+            }
+        }
+
+        return result.filter(Char::isLetter).toList()
+    }
 }
 
 object Sheet {
@@ -148,10 +201,14 @@ object Sheet {
 
 fun main(args: Array<String>) {
     val data = """
-        |100, 20, 3023, (A+E), 10, -30, (D+10), 0, 12345
+        |100, 20, 3023, =(A+E), 10, -30, =(D+10), 0, 12345
         |A=>10
-        |C=>(A*E)
+        |C=>=(A*E)
         |E=>100
+        |H=>=SUM(B:E)
+        |H=>=AVERAGE(B:E)
+        |H=>=MAX(B:E)
+        |H=>=MIN(B:E)
         """.replace(" ", "").trimMargin().lines()
 
         Sheet.calculation(data)
