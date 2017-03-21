@@ -70,6 +70,7 @@ object Study3 {
                 jsonData.filter { it.contains(number) || it.contains(bonusNumber) }
                         .map { it.split(":")[1] } //numberList
                         .forEach {
+
                             if (numberMap[it.toInt()] == null) {
                                 numberMap[it.toInt()] = if (winnerCount > 0) winnerCount else 1
                             } else {
@@ -87,12 +88,11 @@ object Study3 {
             }
 
             val findList = arrayListOf<Pair<Int, Int>>()
-            //println(type.name + " : " + list)
-
             var i = 0
             while (findList.size < 7) {
-                findList.addAll(list.filter { it.second == list[i].second })
-                i++
+                val temp = list.filter { it.second == list[i].second }
+                findList.addAll(temp)
+                i += temp.size
             }
 
             return findList
@@ -102,18 +102,33 @@ object Study3 {
             var str = list[0].first.toString()
 
             if (list.size > 7) {
-                //TODO : 중복일때의 출력
-                for (i in 1..list.size - 1) {
+                // 중복일때의 출력
+                //find fixedPos
+                var fixedPos = 0
+                var count = 0
+                while (fixedPos < 5) {
+                    val temp = list.filter { it.second == list[fixedPos].second }
+
+                    if (count + temp.size > 6) {
+                        break
+                    }
+                    fixedPos += temp.size
+                    count += temp.size
+                }
+
+                for (i in 1..fixedPos - 1) {
                     str += "," + list[i].first
                 }
+
+                val remains = list.subList(fixedPos, list.size)
+                remains.forEach { println(str + "," + it.first) }
 
             } else {
                 for (i in 1..list.size - 1) {
                     str += "," + list[i].first
                 }
+                println(str)
             }
-
-            println(str)
         }
     }
 }
