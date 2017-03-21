@@ -23,7 +23,8 @@ class Lotto(src: SimpleJson) {
 }
 
 fun <T> permutations(lists: List<List<T>>?): List<List<T>> {
-    fun <T> permutations(original: List<List<T>>, res: MutableList<List<T>>, depth: Int, current: List<T>): MutableList<List<T>> {
+    fun <T> permutations(original: List<List<T>>, res: MutableList<List<T>>, 
+                         depth: Int, current: List<T>): MutableList<List<T>> {
         if (depth < original.size) {
             original[depth].forEach { permutations(original, res, depth + 1, current.toMutableList() + it) }
         } else {
