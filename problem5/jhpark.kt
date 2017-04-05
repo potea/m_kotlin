@@ -1,11 +1,8 @@
 import kotlin.coroutines.experimental.buildSequence
 
 fun ant1(limit: Int) {
-    fun String.lookAndSay(): String {
-        val encoded = StringBuilder()
-        "(([0-9])\\2*)".toRegex().findAll(this).forEach { encoded.append(it.value[0]).append(it.value.length) }
-        return encoded.toString()
-    }
+    fun String.lookAndSay(): String =
+        "(([0-9])\\2*)".toRegex().findAll(this).map { "${it.value[0]}${it.value.length}" }.joinToString("")
 
     var sequence = "1"
     (1..limit - 1).forEach { sequence = sequence.lookAndSay() }
