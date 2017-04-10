@@ -13,7 +13,7 @@ object Study6 {
 
     fun find(min: Int, max: Int, target: Int): String {
         val result = (min + max) / 2
-        if (target == result) return "$result!"
-        else return "$result " + if (target < max) find(min, target, target) else find(target, max, target)
+        if (min == target || max == target || target == result) return "$result!"
+        else return "$result " + if (result > target) find(min, result, target) else find(result, max, target)
     }
 }
