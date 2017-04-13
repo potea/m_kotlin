@@ -10,6 +10,4 @@ fun main(args: Array<String>) {
         check(range)
     }
     guess(readLine()?.toInt()!!, 1..100)
-
-    print((1..100).toList()[1])
 }
